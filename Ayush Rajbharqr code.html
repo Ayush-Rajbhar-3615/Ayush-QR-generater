@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title> AYUSH QR Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #0a0f0d;
+      color: #00ff99;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 30px;
+      min-height: 100;
+      border-radius: 15px;
+      border: 3px solid #00ffcc;
+      
+    }
+    h1 {
+      color: #00ffcc;
+      text-shadow: 0 0 10px #00ffcc;
+      margin-bottom: 20px;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    input, select {
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+      width: 250px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #00ff99;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      color: #000;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #00cc77;
+      transform: scale(1.05);
+    }
+    #gallery {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .qr-card {
+      background: #111;
+      padding: 15px;
+      border-radius: 15px;
+      border: 3px solid #00ffcc;
+      box-shadow: 0 0 10px #00ff99;
+      text-align: center;
+    }
+    .qr-card canvas {
+      border-radius: 10px;
+    }
+    .qr-card h3 {
+      margin-top: 10px;
+      color: #00ffcc;
+    }
+    .qr-card button {
+      margin-top: 10px;
+    }
+    .Head{
+        padding: 10px 20px;
+      background:#0;
+      border: 2px solid green;
+      border-radius: 600px;
+      cursor: pointer;
+   
+    }
+  </style>
+</head>
+<body>
+  <h1 class="Head">⚡Ayush QR Generator⚡</h1>
+
+  <div class="controls">
+    <input type="text" id="link" placeholder="Enter your link here...">
+    <input type="text" id="webName" placeholder="Enter Website Name...">
+    <label>Border Color: <input type="color" id="borderColor" value="#00ff99"></label>
+    <label>QR Size: 
+      <select id="qrSize">
+        <option value="150">150px</option>
+        <option value="200" selected>200px</option>
+        <option value="250">250px</option>
+        <option value="300">300px</option>
+      </select>
+    </label>
+    <button onclick="generateQR()">Generate QR</button>
+  </div>
+
+  <div id="gallery"></div>
+
+  <script>
+    function generateQR() {
+      let link = document.getElementById("link").value;
+      let webName = document.getElementById("webName").value || "Hackify QR";
+      let borderColor = document.getElementById("borderColor").value;
+      let qrSize = parseInt(document.getElementById("qrSize").value);
+
+      if (link.trim() === "") {
+        alert("Please enter a valid link!");
+        return;
+      }
+
+      // Wrapper card
+      let wrapper = document.createElement("div");
+      wrapper.className = "qr-card";
+      wrapper.style.borderColor = borderColor;
+
+      // QR container
+      let qrDiv = document.createElement("div");
+      qrDiv.style.margin = "auto";
+
+      // Force canvas mode
+      let qr = new QRCode(qrDiv, {
+        text: link,
+        width: qrSize,
+        height: qrSize,
+        colorDark : borderColor,
+        colorLight : "#0a0f0d",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+
+      // Clear IMG if generated
+      setTimeout(() => {
+        let img = qrDiv.querySelector("img");
+        if (img) {
+          let canvas = document.createElement("canvas");
+          qr.makeCode(link);
+          qrDiv.innerHTML = "";
+          new QRCode(qrDiv, {
+            text: link,
+            width: qrSize,
+            height: qrSize,
+            colorDark : borderColor,
+            colorLight : "#0a0f0d",
+            correctLevel : QRCode.CorrectLevel.H
+          });
+        }
+      }, 100);
+
+      // Website name
+      let nameTag = document.createElement("h3");
+      nameTag.innerText = webName;
+
+      // Download button
+      let downloadBtn = document.createElement("button");
+      downloadBtn.innerText = "Download QR";
+      downloadBtn.onclick = function() {
+        let canvas = qrDiv.querySelector("canvas");
+        if (canvas) {
+          let linkEl = document.createElement("a");
+          linkEl.href = canvas.toDataURL("image/png");
+          linkEl.download = webName.replace(/\s+/g, "_") + "_QR.png";
+          linkEl.click();
+        } else {
+          alert("Canvas not found. Try again!");
+        }
+      };
+
+      wrapper.appendChild(qrDiv);
+      wrapper.appendChild(nameTag);
+      wrapper.appendChild(downloadBtn);
+      document.getElementById("gallery").appendChild(wrapper);
+    }
+  </script>
+</body>
+</html>
